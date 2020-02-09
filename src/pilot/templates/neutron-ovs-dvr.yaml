@@ -1,26 +1,39 @@
-# Copyright (c) 2016-2019 Dell Inc. or its subsidiaries.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# A Heat environment file that deploys ML2/OVS in the overcloud.
 resource_registry:
-  OS::TripleO::Services::ComputeNeutronL3Agent: ./overcloud/docker/services/neutron-l3.yaml
-  OS::TripleO::Services::ComputeNeutronMetadataAgent: ./overcloud/docker/services/neutron-metadata.yaml
+  # Default Neutron ML2 puppet plugin to use when NeutronCorePlugin is set to ML2
+  # FIXME(bogdando): can not be switched yet due to puppet-base issues
+  # see https://review.opendev.org/#/c/563443
+  OS::TripleO::Docker::NeutronMl2PluginBase: ./overcloud/deployment/neutron/neutron-plugin-ml2.yaml
+
+  OS::TripleO::Services::NeutronServer: ./overcloud/deployment/neutron/neutron-api-container-puppet.yaml
+  OS::TripleO::Services::NeutronApi: ./overcloud/deployment/neutron/neutron-api-container-puppet.yaml
+  OS::TripleO::Services::NeutronCorePlugin: ./overcloud/deployment/neutron/neutron-plugin-ml2-container-puppet.yaml
+  OS::TripleO::Services::NeutronMetadataAgent: ./overcloud/deployment/neutron/neutron-metadata-container-puppet.yaml
+  OS::TripleO::Services::NeutronOvsAgent: ./overcloud/deployment/neutron/neutron-ovs-agent-container-puppet.yaml
+  OS::TripleO::Services::NeutronDhcpAgent: ./overcloud/deployment/neutron/neutron-dhcp-container-puppet.yaml
+  OS::TripleO::Services::ComputeNeutronOvsAgent: ./overcloud/deployment/neutron/neutron-ovs-agent-container-puppet.yaml
+  OS::TripleO::Services::NeutronL3Agent: ./overcloud/deployment/neutron/neutron-l3-container-puppet.yaml
+  OS::TripleO::Services::ComputeNeutronL3Agent: ./overcloud/deployment/neutron/neutron-l3-container-puppet.yaml
+  OS::TripleO::Services::ComputeNeutronMetadataAgent: ./overcloud/deployment/neutron/neutron-metadata-container-puppet.yaml
+  OS::TripleO::ComputeDVR::Net::SoftwareConfig: ./overcloud/net-config-bridge.yaml
+
+  # Disable OVN services
+  OS::TripleO::Services::OVNController: OS::Heat::None
+  OS::TripleO::Services::OVNDBs: OS::Heat::None
+  OS::TripleO::Services::OVNMetadataAgent: OS::Heat::None
 
 parameter_defaults:
 
   # DVR requires that the L2 population feature is enabled
   NeutronMechanismDrivers: ['openvswitch', 'l2population']
   NeutronEnableL2Pop: 'True'
+
+  NeutronPluginExtensions: "qos,port_security"
+  NeutronTypeDrivers: 'vxlan,vlan,flat,gre'
+  NeutronNetworkType: 'vxlan'
+  NeutronServicePlugins: 'router,qos,segments,trunk'
+  NeutronVniRanges: ['1:65536', ]
+  KernelIpNonLocalBind: 0
 
   # Setting NeutronEnableDVR enables distributed routing support in the
   # ML2 plugin and agents that support this feature
@@ -36,9 +49,15 @@ parameter_defaults:
   # that host. It is necessary to reserve memory on the compute nodes to avoid
   # memory issues when creating instances that are connected to routed
   # networks. The current expected consumption is 50 MB per router in addition
-  # to the base reserved amount.
-  NovaReservedHostMemory: 4096
+  # to the base reserved amount.  Deployers should refer to existing
+  # documentation, release notes, etc. for additional information on estimating
+  # an appropriate value. The provided value here is based on an estimate of 10
+  # routers and is an example value *only* and should be reviewed and modified
+  # if necessary before deploying.
+  NovaReservedHostMemory: 2560
 
-  DellComputeParameters:
+  # Required if deploying with the ComputeDVR role, which is recommended
+  # if using the default network templates as it will configure the
+  # host networking to work with the default 'datacentre' network.
+  ComputeDVRParameters:
     NeutronL3AgentMode: 'dvr'
-

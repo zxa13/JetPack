@@ -1,4 +1,4 @@
-heat_template_version: queens
+heat_template_version: rocky
 description: >
   Bond and VLAN configuration for compute nodes. comment14_0: ' The values of the following parameters are overridden by the
   entries in' comment15_0: ' network-environment.yaml'
@@ -129,7 +129,7 @@ parameters:
     default: 9000
     description: MTU value for this network.
     type: number
-    
+
 resources:
   OsNetConfigImpl:
     type: OS::Heat::SoftwareConfig
@@ -190,7 +190,7 @@ resources:
                   device: bond0
                   vlan_id:
                     get_param: TenantNetworkVlanID
-                  mtu: 
+                  mtu:
                     get_param: TenantNetworkMTU
                   addresses:
                   - ip_netmask:
@@ -205,7 +205,7 @@ resources:
                   - ip_netmask:
                       get_param: InternalApiIpSubnet
               - type: ovs_bridge
-                name:  
+                name:
                   bridge_name
                 mtu:
                   get_param: DefaultBondMTU
@@ -242,4 +242,3 @@ outputs:
     description: The OsNetConfigImpl resource.
     value:
       get_resource: OsNetConfigImpl
-
