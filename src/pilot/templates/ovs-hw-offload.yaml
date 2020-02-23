@@ -13,5 +13,13 @@ parameter_defaults:
   # Kernel arguments for ComputeSriov node
   DellComputeParameters:
     OvsHwOffload: True
+    NeutronPhysicalDevMappings:
+      - physint:p2p1
+      - physint:p2p2
+    NovaPCIPassthrough:
+      - devname: "p2p1"
+        physical_network: "physint"
+      - devname: "p2p2"
+        physical_network: "physint"
   DellComputeHCIParameters:
     OvsHwOffload: True

@@ -8,7 +8,3 @@ parameter_defaults:
   NovaSchedulerAvailableFilters: ["nova.scheduler.filters.all_filters","nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter"]
   NeutronEnableIsolatedMetadata: true
   NeutronEnableForceMetadata: true
-  NeutronTunnelTypes: ''
-  NeutronSriovNumVFs: 
-  NeutronPhysicalDevMappings: 
-  NovaPCIPassthrough: 

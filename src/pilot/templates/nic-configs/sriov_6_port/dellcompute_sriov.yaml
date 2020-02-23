@@ -202,6 +202,24 @@ resources:
                   addresses:
                   - ip_netmask:
                       get_param: InternalApiIpSubnet
+                - type: sriov_pf
+                  name:
+                    get_param: ComputeSriovInterface1
+                  mtu:
+                    get_param: DefaultBondMTU
+                  numvfs: 4
+                  promisc: true
+                  link_mode: switchdev
+                  use_dhcp: false
+                - type: sriov_pf
+                  name:
+                    get_param: ComputeSriovInterface2
+                  mtu:
+                    get_param: DefaultBondMTU
+                  numvfs: 4
+                  promisc: true
+                  link_mode: switchdev
+                  use_dhcp: false    
               - type: ovs_bridge
                 name: br-bond1
                 mtu:
@@ -233,19 +251,7 @@ resources:
                     get_param: StorageNetworkMTU
                   addresses:
                   - ip_netmask:
-                      get_param: StorageIpSubnet
-              - type: interface
-                name:
-                  get_param: ComputeSriovInterface1
-                mtu:
-                  get_param: DefaultBondMTU
-                use_dhcp: false
-              - type: interface
-                name:
-                  get_param: ComputeSriovInterface2
-                mtu:
-                  get_param: DefaultBondMTU
-                use_dhcp: false                                          
+                      get_param: StorageIpSubnet                                      
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.

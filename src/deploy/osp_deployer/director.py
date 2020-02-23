@@ -1177,7 +1177,8 @@ class Director(InfraHost):
         self.setup_nic_configuration()
 
         if self.settings.enable_sriov is True:
-            self.setup_sriov_nic_configuration()
+            #self.setup_sriov_nic_configuration()
+            logger.debug("SKIPPING SRIOV CONFIG AS HRDCODED")
 
         if self.settings.overcloud_static_ips is True:
             logger.debug("Updating static_ips yaml for the overcloud nodes")
